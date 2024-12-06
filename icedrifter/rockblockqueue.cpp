@@ -49,7 +49,7 @@ int rbqFindEmptyEntry(void) {
   int i;
 
   for (i = 0; i < RBQ_SIZE; i++) {
-    if (rbqQueue[i].msgType = RBQ_MSG_TYPE_FREE) {
+    if (rbqQueue[i].msgType == RBQ_MSG_TYPE_FREE) {
       return (i);
     }
   }
@@ -63,10 +63,24 @@ int rbqFindEmptyEntry(void) {
 int rbqTransmitQueued(void) {
 
   int i;
+  int j;
   int rc;
 
   for (i = 0; i < RBQ_SIZE; i++) {
     if (rbqQueue[i].msgType != RBQ_MSG_TYPE_FREE) {
+
+#ifdef SERIAL_DEBUG_RB_QUEUE
+      DEBUG_SERIAL.print(F("Sending message:\n"));
+      if (rbqQueue[i].msgType == RBQ_MSG_TYPE_CHAR) {
+        DEBUG_SERIAL.print((char *)(rbqQueue[i].msg));
+      } 
+      for (j = 0; j < rbqQueue[i].msgLen; ++j) {
+        rbqPrintHexChar(rbqQueue[i].msg[j]);
+        DEBUG_SERIAL.print("\n");
+      }
+      delay(1000);
+#endif // SERIAL_DEBUG_RB_QUEUE
+
       if ((rc = rbTransmit(&(rbqQueue[i].msg[0]), rbqQueue[i].msgLen, rbqQueue[i].msgType)) != ISBD_SUCCESS) {
 
 #ifdef SERIAL_DEBUG_RB_QUEUE
@@ -129,6 +143,7 @@ void rbqReleaseEntry(int entNbr) {
 int rbqProcessMessage(uint8_t *msgPtr, uint16_t msgLen, uint8_t msgType) {
 
   int i;
+  int j;
   int temp;
 
 #ifdef SERIAL_DEBUG_RB_QUEUE
@@ -171,7 +186,21 @@ int rbqProcessMessage(uint8_t *msgPtr, uint16_t msgLen, uint8_t msgType) {
 
     rbqQueue[i].msgType = msgType;
     rbqQueue[i].msgLen = msgLen;
-    memmove(rbqQueue[i].msg, msgPtr, msgLen);
+    rbqQueue[i].msg[0] = 0;
+    strcat(rbqQueue[i].msg, msgPtr);
+
+#ifdef SERIAL_DEBUG_RB_QUEUE
+    DEBUG_SERIAL.print(F("Queueing message:\n"));
+    if (rbqQueue[i].msgType == RBQ_MSG_TYPE_CHAR) {
+      DEBUG_SERIAL.print((char *)(rbqQueue[i].msg));
+    } 
+    for (j = 0; j < rbqQueue[i].msgLen; ++j) {
+      rbqPrintHexChar(rbqQueue[i].msg[j]);
+      DEBUG_SERIAL.print("\n");
+    }
+    delay(1000);
+#endif // SERIAL_DEBUG_RB_QUEUE
+
     return (RBQ_GOOD);
 
 #ifdef HUMAN_READABLE_DISPLAY
@@ -235,6 +264,9 @@ int rbqTransmitQueueData(void) {
 //////////////////////////////////////////////// 
 
 #ifdef SERIAL_DEBUG
+      if (rbqQueue[i].msgType == RBQ_MSG_TYPE_CHAR) {
+        rbqQueue[i].msgLen = strlen(rbqQueue[i].msg) + 1;
+      }
       for (j = 0; j < rbqQueue[i].msgLen; j++) {
         rbqPrintHexChar(rbqQueue[i].msg[j]);
       }
@@ -348,7 +380,15 @@ int rbqProcessDataHumanReadable(icedrifterData *idPtr) {
   }
 // fix this!!!
 //    if ((rc = rbTransmit(oBuff, strlen(oBuff) + 1, RBQ_MSG_TYPE_SENSOR_CHAR) != ISBD_SUCCESS)) {
-    if ((rc = rbTransmit(oBuff, strlen(oBuff) + 1, RBQ_MSG_TYPE_SENSOR_BIN) != ISBD_SUCCESS)) {
+  if ((rc = rbTransmit(oBuff, strlen(oBuff) + 1, RBQ_MSG_TYPE_SENSOR_BIN) != ISBD_SUCCESS)) {
+
+#ifdef SERIAL_DEBUG_RB_QUEUE
+    DEBUG_SERIAL.print(F("Bad return code from rbTransmit = "));
+    DEBUG_SERIAL.print(rc);
+    DEBUG_SERIAL.print(F(" - Shutting down and returning!\n"));
+    delay(1000);
+#endif // SERIAL_DEBUG  
+
     rbShutdown();
     return (rc);
   }

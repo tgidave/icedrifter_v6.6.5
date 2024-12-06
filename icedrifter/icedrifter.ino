@@ -306,7 +306,7 @@ void loop() {
 #define testRbqMessaging
   
 #ifdef testRbqMessaging
-  rbqProcessMessage("Hello World!\n", 0, RBQ_MSG_TYPE_CHAR);
+  rbqProcessMessage("Hello World!\n\r", 0, RBQ_MSG_TYPE_CHAR);
 #endif // testRbqMessaging
 
   // Try to get the GPS fix data.
