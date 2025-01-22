@@ -104,6 +104,8 @@ icedrifterData idData;  // Structure for accumulating and sending sensor data,
 
 time_t lbTime;  // Time and date of the last boot.
 
+int testMsgCount = 0;
+
 //#ifdef PROCESS_MESSAGE
 //uint8_t messageBuff[MESSAGE_BUFF_SIZE]; // Buffer used to receive and transmit any available message.
 //bool gotMessage;                        // Indicator that a message was received and needs to be transmitted.
@@ -306,7 +308,10 @@ void loop() {
 #define testRbqMessaging
   
 #ifdef testRbqMessaging
-  rbqProcessMessage("Hello World!\n\r", 0, RBQ_MSG_TYPE_CHAR);
+  if (testMsgCount == 0) {
+    rbqProcessMessage("Hello World!\n\r", 0, RBQ_MSG_TYPE_CHAR);
+    ++testMsgCount;
+  }
 #endif // testRbqMessaging
 
   // Try to get the GPS fix data.

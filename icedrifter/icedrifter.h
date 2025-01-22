@@ -10,7 +10,7 @@
 
 #include <time.h>
 
-#define HARDWARE_VERSION "6.7"
+#define HARDWARE_VERSION "6.6.5"
 #define SOFTWARE_VERSION "1.1.0"
 
 // ****************************************************************************
