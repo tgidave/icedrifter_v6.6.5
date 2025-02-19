@@ -87,7 +87,10 @@
 // collected from the gtracker system and report it back to the user.
 
 //#define PROCESS_MESSAGE
+
 #define MESSAGE_BUFF_SIZE 340
+
+//#define PROCESS_G_MESSAGE
 
 #ifdef ARDUINO
 

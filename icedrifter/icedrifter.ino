@@ -36,6 +36,7 @@
 #include "ms5837_02ba.h"
 #include "ds18b20.h"
 #include "rockblockqueue.h"
+#include "gmessage.h"
 
 #ifdef PROCESS_CHAIN_DATA
   #include "chain.h"
@@ -144,8 +145,8 @@ void accumulateandsendData(void) {
   int chainRetryCount;
   int recCount;
   uint8_t* wkPtr;
-
-#ifdef SERIAL_DEBUG
+ 
+  #ifdef SERIAL_DEBUG
   struct tm* debugtimeInfo;
   char* debugGMTPtr;
   char debugbuff[32];
@@ -299,13 +300,18 @@ void loop() {
 
   int sleepSecs;  // Number of seconds to sleep before the processor is woken up.
   int sleepMins;  // Number of minutes to sleep before the processor is woken up.
+  bool gMsgDone = false;
+
+#ifdef PROCESS_G_MESSAGE
+  gMsgProc();
+#endif // PROCESS_G_MESSAGE
 
   noFixFoundCount = 0;  // clear the no fix found count.
 
   digitalWrite(MS5837_DS18B20_GPS_POWER_PIN, HIGH);
   delay(1000);
 
-#define testRbqMessaging
+//#define testRbqMessaging
   
 #ifdef testRbqMessaging
   if (testMsgCount == 0) {
