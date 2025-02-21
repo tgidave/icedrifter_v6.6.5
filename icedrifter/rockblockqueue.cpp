@@ -302,17 +302,24 @@ int rbqProcessDataHumanReadable(icedrifterData *idPtr) {
   delay(1000);
 #endif // SERIAL_DEBUG_RB_QUEUE
 
+#define SERIAL_DEBUG_GMT
+
+#ifdef SERIAL_DEBUG_GMT
+  DEBUG_SERIAL.print("\nGMT debug=");
+  DEBUG_SERIAL.print((int)idPtr->idGPSTime);
+  DEBUG_SERIAL.print("\n");
+#endif // SERIAL_DEBUG_ROCKBLOCK
+
   oBuff[0] = 0;
   strcat(oBuff, "\nGMT=");
   timeInfo = gmtime(idPtr->idGPSTime);
   buffPtr = asctime(timeInfo);
   strcat(oBuff, buffPtr);
 
-//#define SERIAL_DEBUG_GMT
 
 #ifdef SERIAL_DEBUG_GMT
   DEBUG_SERIAL.print("\nGMT debug=");
-  DEBUG_SERIAL.print(buffPtr);
+  DEBUG_SERIAL.print((int)buffPtr);
   DEBUG_SERIAL.print("\n");
 #endif // SERIAL_DEBUG_ROCKBLOCK
 

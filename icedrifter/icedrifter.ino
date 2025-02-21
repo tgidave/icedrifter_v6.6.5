@@ -175,7 +175,11 @@ void accumulateandsendData(void) {
     idData.idLongitude = 0;
   }
 
-#ifdef SERIAL_DEBUG_ROCKBLOCK
+#ifdef SERIAL_DEBUG
+
+  DEBUG_SERIAL.print("\nTime = ");
+  DEBUG_SERIAL.print((int)(&idData.idGPSTime));
+  DEBUG_SERIAL.print("\n");
   debugtimeInfo = gmtime(&idData.idGPSTime);
   debugGMTPtr = asctime(debugtimeInfo);
   strcpy(debugbuff, debugGMTPtr);
