@@ -22,9 +22,12 @@
  *  v0.0   - First release
  */
 
-#include <Arduino.h>
-#include <IridiumSBD.h>
+
+//#include <Arduino.h>
+#include <stdint.h>
 #include <string.h>
+#include <time.h>
+#include <IridiumSBD.h>
 
 #include "icedrifter.h"
 #include "rockblock.h"
@@ -76,8 +79,8 @@ int rbqTransmitQueued(void) {
       } 
       for (j = 0; j < rbqQueue[i].msgLen; ++j) {
         rbqPrintHexChar(rbqQueue[i].msg[j]);
-        DEBUG_SERIAL.print("\n");
       }
+      DEBUG_SERIAL.print("\n");
       delay(1000);
 #endif // SERIAL_DEBUG_RB_QUEUE
 
@@ -116,30 +119,7 @@ int rbqInit(void) {
 
   return (RBQ_GOOD);
 }
-/*
-int rbqReserveEntry(void) { 
-  for (i = 0; i < RBQ_SIZE; i++) {
 
-    if (rbqQueue[i].msg[0] == 0) {
-      rbqQueue[i].msg = (void *)0xffffffff;
-      rbqQueue[i].msgLen = 0;
-      rbqQueue[i].msgType = MSG_TYPE_RESERVED;
-      return(i);
-    }
-  }
-  return(RBQ_QUEUE_FULL);
-}
-
-void rbqReleaseEntry(int entNbr) {
-  if (rbqQueue[entNbr].msgPtr != (void*)0xffffffff) {
-    return (RBQ_ENTRY_NOT_RSVD);
-  }
-
-  rbqQueue[entNbr].msgPtr = (void *)NULL;
-  rbqQueue[entNbr].msgLen = 0;
-  rbqQueue[i].msgType = MSG_TYPE_RESERVED;
-    
-*/
 int rbqProcessMessage(uint8_t *msgPtr, uint16_t msgLen, uint8_t msgType) {
 
   int i;
@@ -287,10 +267,10 @@ int rbqTransmitQueueData(void) {
 
 int rbqProcessDataHumanReadable(icedrifterData *idPtr) {
 
-  struct tm *timeInfo;
+  struct tm timeInfo;
   int i;
 
-  uint8_t oBuff[MESSAGE_BUFF_SIZE + 1];
+  char oBuff[MESSAGE_BUFF_SIZE];
   uint8_t *buffPtr;
   uint8_t buff[128];
   uint8_t rc;
@@ -306,36 +286,27 @@ int rbqProcessDataHumanReadable(icedrifterData *idPtr) {
 
 #ifdef SERIAL_DEBUG_GMT
   DEBUG_SERIAL.print("\nGMT debug=");
-  DEBUG_SERIAL.print((int)idPtr->idGPSTime);
+  DEBUG_SERIAL.print(idPtr->idGPSTime, HEX);
   DEBUG_SERIAL.print("\n");
 #endif // SERIAL_DEBUG_ROCKBLOCK
 
   oBuff[0] = 0;
   strcat(oBuff, "\nGMT=");
-  timeInfo = gmtime(idPtr->idGPSTime);
-  buffPtr = asctime(timeInfo);
-  strcat(oBuff, buffPtr);
-
+  strcat(oBuff, asctime(gmtime(&idPtr->idGPSTime)));
 
 #ifdef SERIAL_DEBUG_GMT
-  DEBUG_SERIAL.print("\nGMT debug=");
-  DEBUG_SERIAL.print((int)buffPtr);
+  DEBUG_SERIAL.print(oBuff);
   DEBUG_SERIAL.print("\n");
 #endif // SERIAL_DEBUG_ROCKBLOCK
 
   strcat(oBuff, "\nLBT=");
-  timeInfo = gmtime(idPtr->idLastBootTime);
-  buffPtr = asctime(timeInfo);
-  strcat(oBuff, buffPtr);
+  strcat(oBuff, asctime(gmtime(&idPtr->idLastBootTime)));
   strcat(oBuff, "\nLat=");
   buffPtr = dtostrf(idPtr->idLatitude, 4, 6, buff);
   strcat(oBuff, buffPtr);
   strcat(oBuff, "\nLon=");
   buffPtr = dtostrf(idPtr->idLongitude, 4, 6, buff);
   strcat(oBuff, buffPtr);
-//    strcat(oBuff, "\nTmp=");
-//    buffPtr = dtostrf(idPtr->idTemperature, 4, 2, buff);
-//    strcat(oBuff, buffPtr);
   strcat(oBuff, "\nBP=");
   buffPtr = dtostrf(idPtr->idPressure, 6, 2, buff);
   strcat(oBuff, buffPtr);

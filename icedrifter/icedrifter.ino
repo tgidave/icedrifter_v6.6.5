@@ -30,6 +30,7 @@
 #include <time.h>
 #include <TinyGPS++.h> // NMEA parsing: http://arduiniana.org
 #include <bosejis_PString.h> // String buffer formatting: http://arduiniana.org
+#include <Wire.h>
 
 #include "icedrifter.h"
 #include "gps.h"
@@ -147,8 +148,8 @@ void accumulateandsendData(void) {
   uint8_t* wkPtr;
  
   #ifdef SERIAL_DEBUG
-  struct tm* debugtimeInfo;
-  char* debugGMTPtr;
+//  struct tm* debugtimeInfo;
+//  char* debugGMTPtr;
   char debugbuff[32];
 #endif // SERIAL_DEBUG
 
@@ -178,11 +179,11 @@ void accumulateandsendData(void) {
 #ifdef SERIAL_DEBUG
 
   DEBUG_SERIAL.print("\nTime = ");
-  DEBUG_SERIAL.print((int)(&idData.idGPSTime));
+  DEBUG_SERIAL.print(idData.idGPSTime, HEX);
   DEBUG_SERIAL.print("\n");
-  debugtimeInfo = gmtime(&idData.idGPSTime);
-  debugGMTPtr = asctime(debugtimeInfo);
-  strcpy(debugbuff, debugGMTPtr);
+//  debugtimeInfo = gmtime(&idData.idGPSTime);
+//  debugGMTPtr = asctime(debugtimeInfo);
+  strcpy(debugbuff, asctime(gmtime(&idData.idGPSTime)));
   DEBUG_SERIAL.print("\nGMT debug=");
   DEBUG_SERIAL.print(debugbuff);
   DEBUG_SERIAL.print("\n");
@@ -249,6 +250,9 @@ void accumulateandsendData(void) {
 
 void setup() {
 
+
+  Wire.begin();
+
   pinMode(MS5837_DS18B20_GPS_POWER_PIN, OUTPUT);
   digitalWrite(MS5837_DS18B20_GPS_POWER_PIN, LOW);
 
@@ -259,6 +263,8 @@ void setup() {
   pinMode(CHAIN_POWER_PIN, OUTPUT);
   digitalWrite(CHAIN_POWER_PIN, LOW);
 #endif // PROCESS_CHAIN_DATA
+
+Wire.begin();
 
 #ifdef SERIAL_DEBUG
   // Start the serial ports
@@ -282,7 +288,9 @@ void setup() {
 
   rbqInit();
 
+
 #ifdef SERIAL_DEBUG
+  // Let the user know we are done with the setup function.
   DEBUG_SERIAL.print(F("Setup done\n")); // Let the user know we are done with the setup function.
 #endif // SERIAL_DEBUG
 
@@ -306,10 +314,6 @@ void loop() {
   int sleepMins;  // Number of minutes to sleep before the processor is woken up.
   bool gMsgDone = false;
 
-#ifdef PROCESS_G_MESSAGE
-  gMsgProc();
-#endif // PROCESS_G_MESSAGE
-
   noFixFoundCount = 0;  // clear the no fix found count.
 
   digitalWrite(MS5837_DS18B20_GPS_POWER_PIN, HIGH);
@@ -323,6 +327,11 @@ void loop() {
     ++testMsgCount;
   }
 #endif // testRbqMessaging
+
+#ifdef PROCESS_G_MESSAGE
+// check to see if the gtracker is ready to report.
+  gMsgProc();
+#endif // PROCESS_G_MESSAGE
 
   // Try to get the GPS fix data.
 

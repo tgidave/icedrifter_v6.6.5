@@ -76,6 +76,11 @@
 
 #define PROCESS_REMOTE_TEMP
 
+// The PROCESS_G_MESSAGE switch is used when a gtracker module is attached 
+// to the I2C buss and is tracking the G forces during decent.
+
+#define PROCESS_G_MESSAGE
+
 // The next define controls whether or not data from the temperature and light
 // sensors are collected and reported.  If the temperature and light
 // chain sensor is not present, comment out the next line.
@@ -83,14 +88,7 @@
 //#define PROCESS_CHAIN_DATA
 #define DROP_CHAIN_RX_TX
 
-// This defines controls whether or not the icedrifter should look for data
-// collected from the gtracker system and report it back to the user.
-
-//#define PROCESS_MESSAGE
-
 #define MESSAGE_BUFF_SIZE 340
-
-//#define PROCESS_G_MESSAGE
 
 #ifdef ARDUINO
 

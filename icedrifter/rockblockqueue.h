@@ -62,6 +62,8 @@ int rbqInit(void);
 
 int rbqProcessMessage(uint8_t *msgPtr, uint16_t msgLen, uint8_t msgType);
 
+int rbqTransmitQueueData(void);
+
 int rbqGetMessage(rbqEntry *msgEntryOut);
 
 
