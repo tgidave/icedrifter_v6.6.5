@@ -3,9 +3,6 @@
 # project.
 *.vpw
 *.vpj
-
-# SlickEdit workspace history and tag files always contain user-specific
-# data so they should not be stored in a repository.
 *.vpwhistu
 *.vpwhist
 *.vtg

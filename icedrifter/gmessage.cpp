@@ -32,26 +32,7 @@ char gMsgBuff[MESSAGE_BUFF_SIZE];
 
 i2cData gData;
 
-//float endianSwap(float gForce) {
-//
-//  uint8_t temp;
-//
-//  union {
-//    float gf;
-//    uint8_t gx[4];
-//  };
-//
-//  gf = gForce;
-//  temp = gx[0];
-//  gx[0] = gx[3];
-//  gx[3] = temp;
-//  temp = gx[1];
-//  gx[1] = gx[2];
-//  gx[2] = temp;
-//  
-//  return(gf); 
-//}
-
+bool gMsgDone = false;
 
 int gMsgProc(void) {
 
@@ -59,11 +40,7 @@ int gMsgProc(void) {
   int wireErr;
   int gDataLen;
   uint8_t *gDataPtr;
-//  char *gMsgPtr;
-//  uint16_t gMsgLen;
-//  uint16_t gMsgBuffLen;
   int rbqReturnCode;
-  bool gMsgDone = false;
   char wkFloat[16];
 
   if (gMsgDone == true) {
@@ -91,26 +68,8 @@ int gMsgProc(void) {
     return (GMSG_NOT_READY);
   }
 
-  Wire.begin();
-
-  // Clear the receive buffer...
-//  while (Wire.available()) {
-//    Wire.read();
-//  }
-
   gDataPtr = (uint8_t *)&gData;
-//  gMsgLen = 0;
-
-
-//    if (gMsgLen >= MESSAGE_BUFF_SIZE) {
-//
-//#ifdef SERIAL_DEBUG
-//      DEBUG_SERIAL.print("\ngMsgProc returning GMSG_MSG_TOO_LONG!");
-//#endif // SERIAL_DEBUG
-//
-//      return(GMSG_MSG_TOO_LONG);
-//    }
-
+  Wire.begin();
   Wire.requestFrom(GTRACKER_PERIPHERAL_I2C_ADDR, i2cDataSize);
   while (!Wire.available());
 
@@ -129,17 +88,9 @@ int gMsgProc(void) {
     }
   }
 
-#ifdef SERIAL_DEBUG
-  DEBUG_SERIAL.print("\n");
-#endif // SERIAL_DEBUG
-
-  sprintf((char *)&gMsgBuff,
-          "maxX = %.2f maxY = %.2f maxZ = %.2f g\nmaxMagX = %.2f maxMagY = %.2f maxMagZ = %.2f maxMag = %.2f g\n\r",
-          gData.maxX, gData.maxY, gData.maxZ, gData.maxMagX, gData.maxMagY, gData.maxMagZ, gData.maxMag);
-
   gMsgBuff[0] = 0;
 
-  strcat(gMsgBuff, "maxX = ");
+  strcat(gMsgBuff, "\nmaxX = ");
   dtostrf(gData.maxX, 6, 2, wkFloat);
   strcat(gMsgBuff, wkFloat);
   strcat(gMsgBuff, "g\nmaxY = ");
@@ -171,8 +122,8 @@ int gMsgProc(void) {
   Wire.end();
 
   if (rbqReturnCode = rbqProcessMessage(gMsgBuff, strlen(gMsgBuff), RBQ_MSG_TYPE_CHAR) == RBQ_GOOD) {
-    gMsgDone == true;
     rbqTransmitQueueData(); //Send the data ASAP...
+    gMsgDone = true;
     return (GMSG_DONE);
   }
 
