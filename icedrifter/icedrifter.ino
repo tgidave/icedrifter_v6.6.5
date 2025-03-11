@@ -108,6 +108,8 @@ time_t lbTime;  // Time and date of the last boot.
 
 int testMsgCount = 0;
 
+int gMessageDone;
+
 //#ifdef PROCESS_MESSAGE
 //uint8_t messageBuff[MESSAGE_BUFF_SIZE]; // Buffer used to receive and transmit any available message.
 //bool gotMessage;                        // Indicator that a message was received and needs to be transmitted.
@@ -250,9 +252,6 @@ void accumulateandsendData(void) {
 
 void setup() {
 
-
-  Wire.begin();
-
   pinMode(MS5837_DS18B20_GPS_POWER_PIN, OUTPUT);
   digitalWrite(MS5837_DS18B20_GPS_POWER_PIN, LOW);
 
@@ -264,7 +263,7 @@ void setup() {
   digitalWrite(CHAIN_POWER_PIN, LOW);
 #endif // PROCESS_CHAIN_DATA
 
-Wire.begin();
+  Wire.begin();
 
 #ifdef SERIAL_DEBUG
   // Start the serial ports
@@ -282,6 +281,7 @@ Wire.begin();
   DEBUG_SERIAL.flush(); // Make sure the above message is displayed before continuing.
 #endif // SERIAL_DEBUG
 
+  gMessageDone = -1;
   firstTime = true;
 
 // The rockblock queue needs to be initialized...
@@ -312,7 +312,6 @@ void loop() {
 
   int sleepSecs;  // Number of seconds to sleep before the processor is woken up.
   int sleepMins;  // Number of minutes to sleep before the processor is woken up.
-  bool gMsgDone = false;
 
   noFixFoundCount = 0;  // clear the no fix found count.
 
@@ -330,7 +329,9 @@ void loop() {
 
 #ifdef PROCESS_G_MESSAGE
 // check to see if the gtracker is ready to report.
-  gMsgProc();
+  if (gMessageDone != GMSG_DONE) {
+    gMessageDone = gMsgProc();
+  }
 #endif // PROCESS_G_MESSAGE
 
   // Try to get the GPS fix data.
