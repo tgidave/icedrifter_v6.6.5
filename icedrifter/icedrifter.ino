@@ -124,21 +124,6 @@ void printHexChar(uint8_t x) {
   Serial.print(hexchars[(x & 0x0f)]);
 }
 
-//char* checkForMessage(void) {
- 
-//  if (gotMessage == true) {
-//#ifdef SERIAL_DEBUG
-//    DEBUG_SERIAL.println("Got msg!");
-//#endif
-//    gotMessage = false;
-//    return((char *)&messageBuff);
-//  }
-//#ifdef SERIAL_DEBUG
-//  DEBUG_SERIAL.println("No msg!");
-//#endif
-//  return(NULL);
-//}
-
 // Accumulate and send data. This function captures the sender
 // data and sends that data to the user.
 void accumulateandsendData(void) {
@@ -149,9 +134,7 @@ void accumulateandsendData(void) {
   int recCount;
   uint8_t* wkPtr;
  
-  #ifdef SERIAL_DEBUG
-//  struct tm* debugtimeInfo;
-//  char* debugGMTPtr;
+#ifdef SERIAL_DEBUG
   char debugbuff[32];
 #endif // SERIAL_DEBUG
 
@@ -179,17 +162,14 @@ void accumulateandsendData(void) {
   }
 
 #ifdef SERIAL_DEBUG
-
   DEBUG_SERIAL.print("\nTime = ");
   DEBUG_SERIAL.print(idData.idGPSTime, HEX);
   DEBUG_SERIAL.print("\n");
-//  debugtimeInfo = gmtime(&idData.idGPSTime);
-//  debugGMTPtr = asctime(debugtimeInfo);
   strcpy(debugbuff, asctime(gmtime(&idData.idGPSTime)));
   DEBUG_SERIAL.print("\nGMT debug=");
   DEBUG_SERIAL.print(debugbuff);
   DEBUG_SERIAL.print("\n");
-#endif // SERIAL_DEBUG_ROCKBLOCK
+#endif // SERIAL_DEBUG
 
   getMs5837Data(&idData);
 
