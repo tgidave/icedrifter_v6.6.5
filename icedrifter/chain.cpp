@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
-
 #include "icedrifter.h"
 #include "chain.h"
 

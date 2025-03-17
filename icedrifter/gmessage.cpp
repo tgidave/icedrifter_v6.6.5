@@ -97,7 +97,7 @@ int gMsgProc(void) {
   dtostrf(gData.maxY, 6, 2, wkFloat);
   strcat(gMsgBuff, wkFloat);
   strcat(gMsgBuff, "g\nmaxZ = ");
-  dtostrf(gData.maxX, 6, 2, wkFloat);
+  dtostrf(gData.maxZ, 6, 2, wkFloat);
   strcat(gMsgBuff, wkFloat);
   strcat(gMsgBuff, "g\nmaxMagX = ");
   dtostrf(gData.maxMagX, 6, 2, wkFloat);
@@ -105,7 +105,7 @@ int gMsgProc(void) {
   strcat(gMsgBuff, "g\nmaxMagY = ");
   dtostrf(gData.maxMagY, 6, 2, wkFloat);
   strcat(gMsgBuff, wkFloat);
-  strcat(gMsgBuff, "g\nmaxMagY = ");
+  strcat(gMsgBuff, "g\nmaxMagZ = ");
   dtostrf(gData.maxMagZ, 6, 2, wkFloat);
   strcat(gMsgBuff, wkFloat);
   strcat(gMsgBuff, "g\nmaxMag = ");

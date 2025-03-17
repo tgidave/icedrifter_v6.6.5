@@ -176,8 +176,8 @@ int rbqProcessMessage(uint8_t *msgPtr, uint16_t msgLen, uint8_t msgType) {
     } 
     for (j = 0; j < rbqQueue[i].msgLen; ++j) {
       rbqPrintHexChar(rbqQueue[i].msg[j]);
-      DEBUG_SERIAL.print("\n");
     }
+    DEBUG_SERIAL.print("\n");
     delay(1000);
 #endif // SERIAL_DEBUG_RB_QUEUE
 
